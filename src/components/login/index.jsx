@@ -5,6 +5,9 @@ import { Controller, useForm } from 'react-hook-form';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged,sendPasswordResetEmail } from 'firebase/auth';
 import Home from '../pages/home/index';
 import { FaRegEye,FaRegEyeSlash } from "react-icons/fa";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 
 const firebaseConfig = {
@@ -41,26 +44,31 @@ const Login = () => {
     try {
       if (isLoginMode) {
         await signInWithEmailAndPassword(auth, email, password);
+        toast.success("Successful login");
       } else {
         await createUserWithEmailAndPassword(auth, email, password);
+        toast.success("Registered user successfully");
       }
     } catch (error) {
-      console.error('Error en la autenticación:', error.message);
+      console.error('Authentication failed:', error.message);
+      toast.error(`Authentication failed: ${error.message}`);
     }
-
+  
     reset();
   };
-
+  
   const handleResetPassword = async () => {
     try {
-      const email = prompt("Ingrese su dirección de correo electrónico para restablecer la contraseña:");
+      const email = prompt("Enter your email address to reset your password:");
       console.log('email', email)
       if (email) {
         await sendPasswordResetEmail(auth, email);
-        console.log("Correo electrónico enviado para restablecer la contraseña. Verifica tu bandeja de entrada.");
+        console.log("Email sent to reset password. Check your inbox.");
+        toast.success("Email sent to reset password. Check your inbox.");
       }
     } catch (error) {
-      console.error("Error al enviar el correo electrónico para restablecer la contraseña:", error.message);
+      console.error("Error sending password reset email:", error.message);
+      toast.error(`Error sending password reset email: ${error.message}`);
     }
   }
 
@@ -69,6 +77,8 @@ const Login = () => {
 
   return (
     <>
+            <ToastContainer theme='dark' autoClose={4000} />
+
       {loggedIn ? (
         <Home />
       ) : (
